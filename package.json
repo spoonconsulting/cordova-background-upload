@@ -1,0 +1,30 @@
+{
+  "name": "cordova-background-upload",
+  "version": "0.1.0",
+  "description": "uploading files without using cordova browser platform on web",
+  "main": "dist/cordova-background-upload.min.js",
+  "scripts": {
+    "prepublish": "webpack --debug; webpack -p"
+  },
+  "keywords": [
+    "cordova",
+    "upload"
+  ],
+  "author": "Mevin Dhunnooa <mevin.dhunnooa@sc-mauritius.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^7.0.12",
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "superagent": "^3.5.2",
+    "ts-loader": "^0.8.1",
+    "tslint": "^3.5.0",
+    "tslint-loader": "^2.1.0",
+    "typescript": "^2.0.9",
+    "webpack": "^1.12.14",
+    "yargs": "^4.2.0"
+  },
+  "dependencies": {
+    "@types/superagent": "^2.0.36"
+  }
+}
