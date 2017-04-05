@@ -1,0 +1,55 @@
+
+## Background Upload Plugin for Cordova
+
+This plugin provides a file upload functionality via javascript for web without necessarily using the browser platform of cordova. On the web it will use [SuperAgent](https://github.com/visionmedia/superagent) to post the files.Since it is done via Ajax, make sure your server supports CORS ([cross origin requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)).
+
+The following browsers are supported:
+
+- Latest Firefox, Chrome, Safari
+- IE10 through latest
+
+Note: Background uploads are not supported on the web
+
+ When in a mobile environment, it will rely on the [cordova-plugin-background-upload](https://github.com/spoonconsulting/cordova-plugin-background-upload.git) to allow for background uploads. If you want to use this plugin in your cordova/ionic mobile app, refer to the [plugin installation guide](https://github.com/spoonconsulting/cordova-plugin-background-upload)
+
+
+**Installation**
+
+```
+npm install --save spoonconsulting/cordova-plugin-background-upload
+```
+
+**Sample usage**
+
+```javascript
+ import { BackgroundUpload } from 'cordova-background-upload';
+ var payload = {
+     "file": fileObject, //the file object obtained from an input type='file'
+     "serverUrl": "http://requestb.in/14cizzj1",
+     "headers": {
+         "api_key": "asdasdwere123sad"
+     },
+     "parameters": {
+         "signature": "mysign",
+         "timestamp": 112321321
+     }
+ };
+ var uploader = new BackgroundUpload();
+ uploader.upload(payload,
+ function(serverResponse) {
+     console.log('Success: ' + serverResponse);
+ }, function(err) {
+     console.log('Error: ' + err);
+ }, function(progress) {
+     console.log('upload progress: ' + progress);
+ });
+
+```
+
+**Configuration** 
+ * filePath: the absolute path for the file to upload (applicable only on mobile platforms), if you are using an html input type file, use the file parameter instead
+ * file:  the file object obtained from an input type='file'
+ * serverUrl: remote server url
+ * headers: custom http headers
+ * parameters: custom parameters for multipart data
+
