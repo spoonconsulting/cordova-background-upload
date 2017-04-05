@@ -13,10 +13,10 @@
   "author": "Mevin Dhunnooa <mevin.dhunnooa@sc-mauritius.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/superagent": "^2.0.36",
     "@types/node": "^7.0.12",
     "chai": "^3.5.0",
     "mocha": "^2.4.5",
-    "superagent": "^3.5.2",
     "ts-loader": "^0.8.1",
     "tslint": "^3.5.0",
     "tslint-loader": "^2.1.0",
@@ -25,6 +25,6 @@
     "yargs": "^4.2.0"
   },
   "dependencies": {
-    "@types/superagent": "^2.0.36"
+    "superagent": "^3.5.2"
   }
 }

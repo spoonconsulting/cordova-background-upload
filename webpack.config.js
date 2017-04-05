@@ -38,8 +38,6 @@ var config = {
     extensions: [ '', '.js', '.ts', '.jsx', '.tsx' ]
   },
   plugins: plugins,
-
-  // Individual Plugin Options
   tslint: {
     emitErrors: true,
     failOnHint: true

@@ -1,7 +1,7 @@
 
 ## Background Upload Plugin for Cordova
 
-This plugin provides a file upload functionality via javascript for web without necessarily using the browser platform of cordova. On the web it will use [SuperAgent](https://github.com/visionmedia/superagent) to post the files.Since it is done via Ajax, make sure your server supports CORS ([cross origin requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)).
+This plugin provides a file upload functionality via javascript without necessarily using the browser platform of cordova. On the web it will use [SuperAgent](https://github.com/visionmedia/superagent) to post the files. Since it is done via Ajax, make sure your server supports CORS ([cross origin requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)).
 
 The following browsers are supported:
 
@@ -10,13 +10,15 @@ The following browsers are supported:
 
 Note: Background uploads are not supported on the web
 
- When in a mobile environment, it will rely on the [cordova-plugin-background-upload](https://github.com/spoonconsulting/cordova-plugin-background-upload.git) to allow for background uploads. If you want to use this plugin in your cordova/ionic mobile app, refer to the [plugin installation guide](https://github.com/spoonconsulting/cordova-plugin-background-upload)
+ When in a mobile environment, it will rely on the [cordova-plugin-background-upload](https://github.com/spoonconsulting/cordova-plugin-background-upload.git) to allow for background uploads. If cordova-plugin-background-upload is not installed, it will fallback to superagent.
 
 
 **Installation**
 
 ```
-npm install --save spoonconsulting/cordova-plugin-background-upload
+npm install --save spoonconsulting/cordova-background-upload
+cordova plugin add cordova-plugin-file --save
+cordova plugin add https://github.com/spoonconsulting/cordova-plugin-background-upload.git --fetch --save
 ```
 
 **Sample usage**

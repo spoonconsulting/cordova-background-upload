@@ -7,6 +7,9 @@ declare var require: { <
   ensure: (paths: string[], callback: (require: < T > (path: string) => T) => void) => void;
 };
 
+
+var request: any = require('superagent/lib/client');
+
 export class BackgroundUpload {
   
   constructor() {
@@ -50,7 +53,7 @@ export class BackgroundUpload {
 
     } else {
       //use super agent
-      var request: any = require('superagent/lib/client');
+      
       console.log(request);
       request.post(payload.serverUrl)
         .set(payload.headers != null ? payload.headers : {})
