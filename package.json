@@ -1,6 +1,6 @@
 {
   "name": "cordova-background-upload",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "uploading files on web",
   "main": "dist/cordova-background-upload.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "upload"
   ],
   "author": "Mevin Dhunnooa",
-   "contributors": [
+  "contributors": [
     {
       "name": "Luc Boissaye",
       "email": "luc@boissaye.fr",
