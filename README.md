@@ -10,13 +10,16 @@ The following browsers are supported:
 
 Note: Background uploads are not supported on the web
 
- When in a mobile environment, it will rely on the [cordova-plugin-background-upload](https://github.com/spoonconsulting/cordova-plugin-background-upload.git) to allow for background uploads. If cordova-plugin-background-upload is not installed, it will fallback to superagent.
+ When in a mobile environment, it will rely on the [cordova-plugin-background-upload](https://github.com/spoonconsulting/cordova-plugin-background-upload.git) to allow for background uploads.
 
 
 **Installation**
 
 ```
 npm install --save cordova-background-upload
+```
+For mobile uploads:
+```
 cordova plugin add cordova-plugin-file --save
 cordova plugin add https://github.com/spoonconsulting/cordova-plugin-background-upload.git --save
 ```
@@ -49,8 +52,8 @@ cordova plugin add https://github.com/spoonconsulting/cordova-plugin-background-
 ```
 
 **Configuration** 
- * filePath: the absolute path for the file to upload (applicable only on mobile platforms), if you are using an html input type file, use the file parameter instead
- * file:  the file object obtained from an input type='file'
+ * filePath: the absolute path for the file to upload (applicable only on mobile platforms), if you are using an html input type file, write the file to disk, then use its path
+ * file:  the file object obtained from an input type='file' (used only on browser)
  * serverUrl: remote server url
  * headers: custom http headers
  * parameters: custom parameters for multipart data
