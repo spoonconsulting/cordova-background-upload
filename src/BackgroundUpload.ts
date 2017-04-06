@@ -29,7 +29,6 @@ export class BackgroundUpload {
       return errorCb("invalid server url");
     }
 
-    var fileToUpload = payload.file;
     var w: any = window;
     if (w.cordova) {
       //on mobile device
@@ -65,7 +64,7 @@ export class BackgroundUpload {
           progressCb(e.percent);
         }
       })
-      .attach('file', fileToUpload)
+      .attach('file', payload.file)
       .end(function (err, res) {
         if (err != null) {
           errorCb(err);
