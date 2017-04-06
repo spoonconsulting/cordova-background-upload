@@ -4,5 +4,6 @@ src/demo*
 src/index*
 webpack.config.js
 dist/demo*
+dist/*.map
 .git*
 .npmignore
