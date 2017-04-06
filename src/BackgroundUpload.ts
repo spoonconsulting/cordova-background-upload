@@ -48,7 +48,7 @@ export class BackgroundUpload {
         return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
 
       } else {
-        console.log('cordova-plugin-background-upload not found..falling back to superagent');
+        console.log('cordova-plugin-background-upload not found..falling back to superagent(background uploads will not be available)');
         //set the fileToUpload to the filePath (superagent can attach files using their path too)
         fileToUpload = payload.filePath;
       }
