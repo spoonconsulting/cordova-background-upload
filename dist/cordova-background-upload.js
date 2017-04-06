@@ -77,7 +77,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (payload.serverUrl.trim() == '') {
 	            return errorCb("invalid server url");
 	        }
-	        var fileToUpload = payload.file;
 	        var w = window;
 	        if (w.cordova) {
 	            //on mobile device
@@ -91,18 +90,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                //use cordova plugin https://github.com/spoonconsulting/cordova-plugin-background-upload
 	                return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
 	            }
-	            else {
-	                console.log('cordova-plugin-background-upload not found..');
-	                //set the fileToUpload to the filePath (superagent can attach files using their path too)
-	                // fileToUpload = payload.filePath.replace('file://', '');
-	                return;
-	            }
+	            return errorCb('cordova-plugin-background-upload not found..');
 	        }
-	        if (!fileToUpload) {
+	        if (!payload.file) {
 	            return errorCb("file parameter is required");
 	        }
-	        //let superdebug: any = require('superagent-debugger');
-	        console.log('uploading : ' + fileToUpload);
 	        //use super agent
 	        request.post(payload.serverUrl)
 	            .set(payload.headers != null ? payload.headers : {})
@@ -112,7 +104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                progressCb(e.percent);
 	            }
 	        })
-	            .attach('file', fileToUpload)
+	            .attach('file', payload.file)
 	            .end(function (err, res) {
 	            if (err != null) {
 	                errorCb(err);
@@ -122,7 +114,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                successCb(res);
 	            }
 	        });
-	        //.use(superdebug(console.info));
 	    };
 	    return BackgroundUpload;
 	}());

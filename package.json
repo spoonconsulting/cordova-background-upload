@@ -1,7 +1,7 @@
 {
   "name": "cordova-background-upload",
-  "version": "0.1.0",
-  "description": "uploading files without using cordova browser platform on web",
+  "version": "0.0.1",
+  "description": "uploading files on web",
   "main": "dist/cordova-background-upload.js",
   "scripts": {
     "prepublish": "webpack --debug; webpack -p"
@@ -10,7 +10,15 @@
     "cordova",
     "upload"
   ],
-  "author": "Mevin Dhunnooa <mevin.dhunnooa@sc-mauritius.com>",
+  "author": "Mevin Dhunnooa",
+   "contributors": [
+    {
+      "name": "Luc Boissaye",
+      "email": "luc@boissaye.fr",
+      "url": "https://github.com/ombr",
+      "hireable": true
+    }
+  ],
   "license": "MIT",
   "devDependencies": {
     "@types/superagent": "^2.0.36",
