@@ -7,3 +7,4 @@ dist/demo*
 dist/*.map
 .git*
 .npmignore
+test
