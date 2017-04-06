@@ -1,6 +1,6 @@
 {
   "name": "cordova-background-upload",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "uploading files on web",
   "main": "dist/cordova-background-upload.js",
   "scripts": {
