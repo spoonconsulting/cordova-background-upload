@@ -2,7 +2,7 @@
   "name": "cordova-background-upload",
   "version": "0.1.0",
   "description": "uploading files without using cordova browser platform on web",
-  "main": "dist/cordova-background-upload.min.js",
+  "main": "dist/cordova-background-upload.js",
   "scripts": {
     "prepublish": "webpack --debug; webpack -p"
   },

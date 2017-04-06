@@ -87,25 +87,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (payload.filePath == "") {
 	                return errorCb("invalid filePath");
 	            }
-	            if (typeof FileTransferManager != undefined) {
+	            if (typeof FileTransferManager != 'undefined') {
 	                //use cordova plugin https://github.com/spoonconsulting/cordova-plugin-background-upload
 	                return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
 	            }
 	            else {
-	                console.log('cordova-plugin-background-upload not found..falling back to superagent(background uploads will not be available)');
+	                console.log('cordova-plugin-background-upload not found..');
 	                //set the fileToUpload to the filePath (superagent can attach files using their path too)
-	                fileToUpload = payload.filePath;
+	                // fileToUpload = payload.filePath.replace('file://', '');
+	                return;
 	            }
 	        }
 	        if (!fileToUpload) {
 	            return errorCb("file parameter is required");
 	        }
+	        //let superdebug: any = require('superagent-debugger');
+	        console.log('uploading : ' + fileToUpload);
 	        //use super agent
 	        request.post(payload.serverUrl)
 	            .set(payload.headers != null ? payload.headers : {})
 	            .field(payload.parameters != null ? payload.parameters : {})
 	            .on('progress', function (e) {
-	            if (e.percent != null && e.percent != undefined) {
+	            if (e.percent != null && e.percent != undefined && e.percent >= 0) {
 	                progressCb(e.percent);
 	            }
 	        })
@@ -119,6 +122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                successCb(res);
 	            }
 	        });
+	        //.use(superdebug(console.info));
 	    };
 	    return BackgroundUpload;
 	}());

@@ -29,7 +29,6 @@ export class BackgroundUpload {
       return errorCb("invalid server url");
     }
 
-
     var fileToUpload = payload.file;
     var w: any = window;
     if (w.cordova) {
@@ -42,21 +41,18 @@ export class BackgroundUpload {
         if (payload.filePath == "") {
           return errorCb("invalid filePath");
         }
-
-      if (typeof FileTransferManager != undefined) {
-        //use cordova plugin https://github.com/spoonconsulting/cordova-plugin-background-upload
+      
+       if (typeof FileTransferManager != 'undefined') {
+         //use cordova plugin https://github.com/spoonconsulting/cordova-plugin-background-upload
         return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
 
-      } else {
-        console.log('cordova-plugin-background-upload not found..falling back to superagent(background uploads will not be available)');
-        //set the fileToUpload to the filePath (superagent can attach files using their path too)
-        fileToUpload = payload.filePath;
-      }
-
-
+      } 
+        
+      return errorCb('cordova-plugin-background-upload not found..');
+    
     }
 
-    if (!fileToUpload) {
+    if (!payload.file) {
       return errorCb("file parameter is required");
     }
 
@@ -65,7 +61,7 @@ export class BackgroundUpload {
       .set(payload.headers != null ? payload.headers : {})
       .field(payload.parameters != null ? payload.parameters : {})
       .on('progress', function (e) {
-        if (e.percent != null && e.percent != undefined) {
+        if (e.percent != null && e.percent != undefined && e.percent >= 0) {
           progressCb(e.percent);
         }
       })
