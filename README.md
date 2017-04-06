@@ -18,7 +18,7 @@ Note: Background uploads are not supported on the web
 ```
 npm install --save cordova-background-upload
 cordova plugin add cordova-plugin-file --save
-cordova plugin add https://github.com/spoonconsulting/cordova-plugin-background-upload.git --fetch --save
+cordova plugin add https://github.com/spoonconsulting/cordova-plugin-background-upload.git --save
 ```
 
 **Sample usage**
