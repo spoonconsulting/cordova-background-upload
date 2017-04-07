@@ -10,7 +10,7 @@ The following browsers are supported:
 
 Note: Background uploads are not supported on the web
 
- When in a mobile environment, it will rely on the [cordova-plugin-background-upload](https://github.com/spoonconsulting/cordova-plugin-background-upload.git) to allow for background uploads.
+ When in a mobile environment, it will rely on the [cordova-plugin-background-upload](https://github.com/spoonconsulting/cordova-plugin-background-upload.git) to allow for background uploads. If the plugin is not installed,it will fallback to superagent upload.
 
 
 **Installation**
