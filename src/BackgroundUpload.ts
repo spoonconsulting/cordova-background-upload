@@ -1,13 +1,6 @@
 declare var FileTransferManager: any;
 declare var cordova: any;
-/*
-//https://github.com/TypeStrong/ts-loader#loading-other-resources-and-code-splitting
-declare var require: { <
-  T > (path: string): T;
-  (paths: string[], callback: (...modules: any[]) => void): void;
-  ensure: (paths: string[], callback: (require: < T > (path: string) => T) => void) => void;
-};
-*/
+
 
 var request: any = require('superagent/lib/client');
 
@@ -81,7 +74,13 @@ export class BackgroundUpload {
                   console.log('file written');
                   //remove the blob from the payload
                   delete payload.file;
-                  return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
+                  return new FileTransferManager().upload(payload).then(function () {
+                    //file uploaded, delete the temporary file
+                    tempFile.remove(function () {}, function (excep) {
+                      console.error('error cleaning up temp file: ' + excep);
+                    });
+                    successCb();
+                  }, errorCb, progressCb);
                 };
 
                 fileWriter.onerror = function (ex) {
@@ -111,7 +110,7 @@ export class BackgroundUpload {
       }
 
     } catch (error) {
-      console.log('error in background upload: '+ error);
+      
       errorCb(error);
     }
 
@@ -131,7 +130,7 @@ export class BackgroundUpload {
         if (err != null) {
           errorCb(err);
         } else {
-          console.log(res.req);
+
           successCb(res);
         }
       });
