@@ -76,75 +76,83 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function BackgroundUpload() {
 	    }
 	    BackgroundUpload.prototype.upload = function (payload, successCb, errorCb, progressCb) {
-	        if (!payload) {
-	            return errorCb("upload settings object is missing or invalid argument");
-	        }
-	        if (!payload.serverUrl) {
-	            return errorCb("server url is required");
-	        }
-	        if (payload.serverUrl.trim() == '') {
-	            return errorCb("invalid server url");
-	        }
-	        if (window.cordova) {
-	            //on mobile device
-	            var fileObject = payload.file;
-	            if (!fileObject) {
-	                //check if filePath is available
-	                if (!payload.filePath) {
-	                    return errorCb("filePath parameter is required");
-	                }
-	                if (payload.filePath == "") {
-	                    return errorCb("invalid filePath");
-	                }
-	                if (typeof FileTransferManager == 'undefined') {
-	                    return errorCb('cordova-plugin-background-upload not found..');
-	                }
-	                //upload natively
-	                return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
+	        try {
+	            if (!payload) {
+	                return errorCb("upload settings object is missing or invalid argument");
 	            }
-	            else {
-	                //file object available, check if upload plugin is installed
-	                if (typeof FileTransferManager == 'undefined') {
-	                    console.log('cordova-plugin-background-upload not found..fallback to superagent..uploads will happen only in foreground');
-	                    return this.uploadViaSuperAgent(payload, successCb, errorCb, progressCb);
+	            if (!payload.serverUrl) {
+	                return errorCb("server url is required");
+	            }
+	            if (payload.serverUrl.trim() == '') {
+	                return errorCb("invalid server url");
+	            }
+	            if (window.cordova) {
+	                //on mobile device
+	                var fileObject = payload.file;
+	                if (!fileObject) {
+	                    //check if filePath is available
+	                    if (!payload.filePath) {
+	                        return errorCb("filePath parameter is required");
+	                    }
+	                    if (payload.filePath == "") {
+	                        return errorCb("invalid filePath");
+	                    }
+	                    if (typeof FileTransferManager == 'undefined') {
+	                        return errorCb('cordova-plugin-background-upload not found..');
+	                    }
+	                    //upload natively
+	                    return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
 	                }
-	                //file object and upload plugin are available
-	                //now check if file plugin has been installed
-	                if (!cordova.file) {
-	                    return errorCb('cordova-plugin-file not found..install it via: cordova plugin add cordova-plugin-file --save');
-	                }
-	                var directoryPath = cordova.file.cacheDirectory;
-	                console.log(directoryPath);
-	                //write the file object to disk
-	                //and use its path to upload natively
-	                window.resolveLocalFileSystemURL(directoryPath, function (dir) {
-	                    dir.getFile(fileObject.name, {
-	                        create: true
-	                    }, function (tempFile) {
-	                        tempFile.createWriter(function (fileWriter) {
-	                            fileWriter.onwriteend = function (e) {
-	                                payload.filePath = directoryPath + fileObject.name;
-	                                console.log('file written');
-	                                return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
-	                            };
-	                            fileWriter.onerror = function (ex) {
-	                                return errorCb("error writing file to disk for upload: " + ex);
-	                            };
-	                            fileWriter.write(fileObject);
-	                        }, function (e) {
-	                            return errorCb("error writing file to disk for upload: " + e);
+	                else {
+	                    //file object available, check if upload plugin is installed
+	                    if (typeof FileTransferManager == 'undefined') {
+	                        console.log('cordova-plugin-background-upload not found..fallback to superagent..uploads will happen only in foreground');
+	                        return this.uploadViaSuperAgent(payload, successCb, errorCb, progressCb);
+	                    }
+	                    //file object and upload plugin are available
+	                    //now check if file plugin has been installed
+	                    if (!cordova.file) {
+	                        return errorCb('cordova-plugin-file not found..install it via: cordova plugin add cordova-plugin-file --save');
+	                    }
+	                    var directoryPath = cordova.file.cacheDirectory;
+	                    console.log(directoryPath);
+	                    //write the file object to disk
+	                    //and use its path to upload natively
+	                    window.resolveLocalFileSystemURL(directoryPath, function (dir) {
+	                        dir.getFile(fileObject.name, {
+	                            create: true
+	                        }, function (tempFile) {
+	                            tempFile.createWriter(function (fileWriter) {
+	                                fileWriter.onwriteend = function (e) {
+	                                    payload.filePath = directoryPath + fileObject.name;
+	                                    console.log('file written');
+	                                    //remove the blob from the payload
+	                                    delete payload.file;
+	                                    return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
+	                                };
+	                                fileWriter.onerror = function (ex) {
+	                                    return errorCb("error writing file to disk for upload: " + ex);
+	                                };
+	                                fileWriter.write(fileObject);
+	                            }, function (e) {
+	                                return errorCb("error writing file to disk for upload: " + e);
+	                            });
 	                        });
 	                    });
-	                });
+	                }
+	            }
+	            else {
+	                //on web
+	                if (!payload.file) {
+	                    return errorCb("file parameter is required");
+	                }
+	                //use super agent
+	                this.uploadViaSuperAgent(payload, successCb, errorCb, progressCb);
 	            }
 	        }
-	        else {
-	            //on web
-	            if (!payload.file) {
-	                return errorCb("file parameter is required");
-	            }
-	            //use super agent
-	            this.uploadViaSuperAgent(payload, successCb, errorCb, progressCb);
+	        catch (error) {
+	            console.log('error in background upload: ' + error);
+	            errorCb(error);
 	        }
 	    };
 	    BackgroundUpload.prototype.uploadViaSuperAgent = function (payload, successCb, errorCb, progressCb) {
