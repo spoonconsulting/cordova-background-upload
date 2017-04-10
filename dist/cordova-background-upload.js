@@ -107,7 +107,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        return errorCb('cordova-plugin-file not found..install it via: cordova plugin add cordova-plugin-file --save');
 	                    }
 	                    var directoryPath = cordova.file.cacheDirectory;
-	                    console.log(directoryPath);
 	                    //write the file object to disk
 	                    //and use its path to upload natively
 	                    window.resolveLocalFileSystemURL(directoryPath, function (dir) {
@@ -117,7 +116,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            tempFile.createWriter(function (fileWriter) {
 	                                fileWriter.onwriteend = function (e) {
 	                                    payload.filePath = directoryPath + fileObject.name;
-	                                    console.log('file written');
 	                                    //remove the blob from the payload
 	                                    delete payload.file;
 	                                    return new FileTransferManager().upload(payload).then(function () {
