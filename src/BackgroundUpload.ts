@@ -74,12 +74,12 @@ export class BackgroundUpload {
                   
                   //remove the blob from the payload
                   delete payload.file;
-                  return new FileTransferManager().upload(payload).then(function () {
+                  return new FileTransferManager().upload(payload).then(function (response) {
                     //file uploaded, delete the temporary file
                     tempFile.remove(function () {}, function (excep) {
                       console.error('error cleaning up temp file: ' + excep);
                     });
-                    successCb();
+                    successCb(response);
                   }, errorCb, progressCb);
                 };
 
