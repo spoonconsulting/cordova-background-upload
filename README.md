@@ -21,7 +21,7 @@ npm install --save cordova-background-upload
 For mobile uploads:
 ```
 cordova plugin add cordova-plugin-file --save
-cordova plugin add https://github.com/spoonconsulting/cordova-plugin-background-upload.git --save
+cordova plugin add cordova-plugin-background-upload --save
 ```
 
 **Sample usage**
