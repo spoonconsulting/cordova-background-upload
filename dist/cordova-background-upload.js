@@ -165,7 +165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                errorCb(err);
 	            }
 	            else {
-	                successCb(res);
+	                successCb(JSON.stringify(res.body));
 	            }
 	        });
 	    };

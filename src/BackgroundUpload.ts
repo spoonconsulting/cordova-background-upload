@@ -130,8 +130,7 @@ export class BackgroundUpload {
         if (err != null) {
           errorCb(err);
         } else {
-
-          successCb(res);
+          successCb(JSON.stringify(res.body));
         }
       });
   }
