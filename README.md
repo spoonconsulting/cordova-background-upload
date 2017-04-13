@@ -58,3 +58,6 @@ cordova plugin add cordova-plugin-background-upload --save
  * headers: custom http headers
  * parameters: custom parameters for multipart data
 
+
+## Credits
+cordova-background-upload is brought to you by [Spoon Consulting](http://www.spoonconsulting.com/).
