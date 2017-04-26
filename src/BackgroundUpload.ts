@@ -72,10 +72,11 @@ export class BackgroundUpload {
             ( < DirectoryEntry > dir).getFile(fileName, {
               create: true
             }, function (tempFile) {
+              console.log(tempFile);
               tempFile.createWriter(function (fileWriter) {
 
                 fileWriter.onwriteend = function (e) {
-                  payload.filePath = directoryPath + fileName;
+                   payload.filePath = tempFile.nativeURL.replace('file://','');//directoryPath + fileName;
                   
                   //remove the blob from the payload
                   delete payload.file;

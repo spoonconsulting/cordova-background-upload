@@ -75,6 +75,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!payload.serverUrl) {
 	                return errorCb("server url is required");
 	            }
+	            if (!payload.headers) {
+	                payload.headers = {};
+	            }
 	            if (payload.serverUrl.trim() == '') {
 	                return errorCb("invalid server url");
 	            }
@@ -114,9 +117,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        dir.getFile(fileName, {
 	                            create: true
 	                        }, function (tempFile) {
+	                            console.log(tempFile);
 	                            tempFile.createWriter(function (fileWriter) {
 	                                fileWriter.onwriteend = function (e) {
-	                                    payload.filePath = directoryPath + fileName;
+	                                    payload.filePath = tempFile.nativeURL.replace('file://', ''); //directoryPath + fileName;
 	                                    //remove the blob from the payload
 	                                    delete payload.file;
 	                                    return new FileTransferManager().upload(payload).then(function (response) {
