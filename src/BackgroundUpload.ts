@@ -21,6 +21,10 @@ export class BackgroundUpload {
         return errorCb("server url is required");
       }
 
+      if (!payload.headers) {
+        payload.headers = {};
+      }
+
       if (payload.serverUrl.trim() == '') {
         return errorCb("invalid server url");
       }
