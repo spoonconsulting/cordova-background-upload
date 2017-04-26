@@ -64,13 +64,14 @@ export class BackgroundUpload {
           //write the file object to disk
           //and use its path to upload natively
           window.resolveLocalFileSystemURL(directoryPath, function (dir) {
-            ( < DirectoryEntry > dir).getFile(fileObject.name, {
+            var fileName = Math.floor(Date.now()) + "_" +fileObject.name;
+            ( < DirectoryEntry > dir).getFile(fileName, {
               create: true
             }, function (tempFile) {
               tempFile.createWriter(function (fileWriter) {
 
                 fileWriter.onwriteend = function (e) {
-                  payload.filePath = directoryPath + fileObject.name;
+                  payload.filePath = directoryPath + fileName;
                   
                   //remove the blob from the payload
                   delete payload.file;
