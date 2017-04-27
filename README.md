@@ -23,6 +23,10 @@ For mobile uploads:
 cordova plugin add cordova-plugin-file --save
 cordova plugin add cordova-plugin-background-upload --save
 ```
+For android, you need to add the permission library also:
+```
+cordova plugin add cordova-plugin-android-permissions --save
+```
 
 **Sample usage**
 
