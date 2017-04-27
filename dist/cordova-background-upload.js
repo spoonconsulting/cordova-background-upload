@@ -109,37 +109,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (!cordova.file) {
 	                        return errorCb('cordova-plugin-file not found..install it via: cordova plugin add cordova-plugin-file --save');
 	                    }
-	                    var directoryPath = cordova.file.cacheDirectory;
-	                    //write the file object to disk
-	                    //and use its path to upload natively
-	                    window.resolveLocalFileSystemURL(directoryPath, function (dir) {
-	                        var fileName = Math.floor(Date.now()) + "_" + fileObject.name;
-	                        dir.getFile(fileName, {
-	                            create: true
-	                        }, function (tempFile) {
-	                            console.log(tempFile);
-	                            tempFile.createWriter(function (fileWriter) {
-	                                fileWriter.onwriteend = function (e) {
-	                                    payload.filePath = tempFile.nativeURL.replace('file://', ''); //directoryPath + fileName;
-	                                    //remove the blob from the payload
-	                                    delete payload.file;
-	                                    return new FileTransferManager().upload(payload).then(function (response) {
-	                                        //file uploaded, delete the temporary file
-	                                        tempFile.remove(function () { }, function (excep) {
-	                                            console.error('error cleaning up temp file: ' + excep);
-	                                        });
-	                                        successCb(response);
-	                                    }, errorCb, progressCb);
-	                                };
-	                                fileWriter.onerror = function (ex) {
-	                                    return errorCb("error writing file to disk for upload: " + ex);
-	                                };
-	                                fileWriter.write(fileObject);
-	                            }, function (e) {
-	                                return errorCb("error writing file to disk for upload: " + e);
-	                            });
+	                    if (cordova.platformId.toLowerCase() == "android") {
+	                        //reqquest for permission for file system on android
+	                        if (!cordova.plugins.permissions) {
+	                            return errorCb('cordova-plugin-android-permissions not found..install it via: cordova plugin add cordova-plugin-android-permissions --save');
+	                        }
+	                        var permissions = cordova.plugins.permissions;
+	                        var self = this;
+	                        permissions.requestPermission(permissions.WRITE_EXTERNAL_STORAGE, function (status) {
+	                            if (!status.hasPermission) {
+	                                return errorCb('file system permission denied');
+	                            }
+	                            else {
+	                                self.uploadNatively(payload, fileObject, successCb, errorCb, progressCb);
+	                            }
+	                        }, function () {
+	                            return errorCb('file system permission denied');
 	                        });
-	                    });
+	                    }
+	                    else {
+	                        //ios
+	                        this.uploadNatively(payload, fileObject, successCb, errorCb, progressCb);
+	                    }
 	                }
 	            }
 	            else {
@@ -154,6 +145,47 @@ return /******/ (function(modules) { // webpackBootstrap
 	        catch (error) {
 	            errorCb(error);
 	        }
+	    };
+	    BackgroundUpload.prototype.uploadNatively = function (payload, fileObject, successCb, errorCb, progressCb) {
+	        //externalCacheDirectory is only for android, fallback to cacheDirectory on iOS
+	        var directoryPath = cordova.file.externalCacheDirectory || cordova.file.cacheDirectory;
+	        //write the file object to disk
+	        //and use its path to upload natively
+	        window.resolveLocalFileSystemURL(directoryPath, function (dir) {
+	            var fileName = Math.floor(Date.now()) + "_" + fileObject.name.replace(/ /g, '_').replace(/%20/g, '');
+	            dir.getFile(fileName, {
+	                create: true
+	            }, function (tempFile) {
+	                console.log(tempFile);
+	                tempFile.createWriter(function (fileWriter) {
+	                    var hasError = false;
+	                    fileWriter.onwriteend = function (e) {
+	                        if (hasError) {
+	                            return;
+	                        }
+	                        payload.filePath = tempFile.nativeURL.replace('file://', ''); //directoryPath + fileName;
+	                        //remove the blob from the payload
+	                        delete payload.file;
+	                        return new FileTransferManager().upload(payload).then(function (response) {
+	                            //file uploaded, delete the temporary file
+	                            tempFile.remove(function () { }, function (excep) {
+	                                console.error('error cleaning up temp file: ' + excep);
+	                            });
+	                            successCb(response);
+	                        }, errorCb, progressCb);
+	                    };
+	                    fileWriter.onerror = function (ex) {
+	                        hasError = true;
+	                        console.error(ex);
+	                        return errorCb("error writing file to disk");
+	                    };
+	                    fileWriter.write(fileObject);
+	                }, function (e) {
+	                    console.error(e);
+	                    return errorCb("error writing file to disk for upload");
+	                });
+	            });
+	        });
 	    };
 	    BackgroundUpload.prototype.uploadViaSuperAgent = function (payload, successCb, errorCb, progressCb) {
 	        request.post(payload.serverUrl)
