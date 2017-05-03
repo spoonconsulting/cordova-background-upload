@@ -66,20 +66,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	var request = __webpack_require__(2);
 	var BackgroundUpload = (function () {
 	    function BackgroundUpload() {
+	        this.nativeUploader = null;
+	        this._handlers = [];
 	    }
-	    BackgroundUpload.prototype.upload = function (payload, successCb, errorCb, progressCb) {
+	    BackgroundUpload.prototype.init = function (options) {
+	        this._handlers = {
+	            'progress': [],
+	            'success': [],
+	            'error': []
+	        };
+	        var self = this;
+	        if (window.cordova) {
+	            //on mobile device
+	            this.nativeUploader = FileTransferManager.init(options);
+	            this.nativeUploader.on('success', function (upload) {
+	                self.emit('success', upload);
+	            });
+	            this.nativeUploader.on('progress', function (upload) {
+	                self.emit('progress', upload);
+	            });
+	            this.nativeUploader.on('error', function (uploadException) {
+	                self.emit('error', uploadException);
+	            });
+	        }
+	        return this;
+	    };
+	    BackgroundUpload.prototype.upload = function (payload) {
 	        try {
 	            if (!payload) {
-	                return errorCb("upload settings object is missing or invalid argument");
+	                self.emit("error", {
+	                    error: "upload settings object is missing or invalid argument"
+	                });
 	            }
 	            if (!payload.serverUrl) {
-	                return errorCb("server url is required");
+	                self.emit("error", {
+	                    error: "server url is required"
+	                });
 	            }
 	            if (!payload.headers) {
 	                payload.headers = {};
 	            }
 	            if (payload.serverUrl.trim() == '') {
-	                return errorCb("invalid server url");
+	                self.emit("error", {
+	                    error: "invalid server url"
+	                });
 	            }
 	            if (window.cordova) {
 	                //on mobile device
@@ -87,68 +117,85 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (!fileObject) {
 	                    //check if filePath is available
 	                    if (!payload.filePath) {
-	                        return errorCb("filePath parameter is required");
+	                        self.emit("error", {
+	                            error: "filePath parameter is required"
+	                        });
 	                    }
 	                    if (payload.filePath == "") {
-	                        return errorCb("invalid filePath");
+	                        self.emit("error", {
+	                            error: "invalid filePath"
+	                        });
 	                    }
 	                    if (typeof FileTransferManager == 'undefined') {
-	                        return errorCb('cordova-plugin-background-upload not found..');
+	                        self.emit("error", {
+	                            error: 'cordova-plugin-background-upload not found..'
+	                        });
 	                    }
 	                    //upload natively
-	                    return new FileTransferManager().upload(payload).then(successCb, errorCb, progressCb);
+	                    this.nativeUploader.startUpload(payload);
 	                }
 	                else {
 	                    //file object available, check if upload plugin is installed
 	                    if (typeof FileTransferManager == 'undefined') {
 	                        console.log('cordova-plugin-background-upload not found..fallback to superagent..uploads will happen only in foreground');
-	                        return this.uploadViaSuperAgent(payload, successCb, errorCb, progressCb);
+	                        return this.uploadViaSuperAgent(payload);
 	                    }
 	                    //file object and upload plugin are available
 	                    //now check if file plugin has been installed
 	                    if (!cordova.file) {
-	                        return errorCb('cordova-plugin-file not found..install it via: cordova plugin add cordova-plugin-file --save');
+	                        self.emit("error", {
+	                            error: 'cordova-plugin-file not found..install it via: cordova plugin add cordova-plugin-file --save'
+	                        });
 	                    }
 	                    if (cordova.platformId.toLowerCase() == "android") {
 	                        //reqquest for permission for file system on android
 	                        if (!cordova.plugins.permissions) {
-	                            return errorCb('cordova-plugin-android-permissions not found..install it via: cordova plugin add cordova-plugin-android-permissions --save');
+	                            self.emit("error", {
+	                                error: 'cordova-plugin-android-permissions not found..install it via: cordova plugin add cordova-plugin-android-permissions --save'
+	                            });
 	                        }
 	                        var permissions = cordova.plugins.permissions;
 	                        var self = this;
 	                        permissions.requestPermission(permissions.WRITE_EXTERNAL_STORAGE, function (status) {
 	                            if (!status.hasPermission) {
-	                                return errorCb('file system permission denied');
+	                                self.emit("error", {
+	                                    error: 'file system permission denied'
+	                                });
 	                            }
 	                            else {
-	                                self.uploadNatively(payload, fileObject, successCb, errorCb, progressCb);
+	                                self.uploadNatively(payload, fileObject);
 	                            }
 	                        }, function () {
-	                            return errorCb('file system permission denied');
+	                            self.emit("error", {
+	                                error: 'file system permission denied'
+	                            });
 	                        });
 	                    }
 	                    else {
 	                        //ios
-	                        this.uploadNatively(payload, fileObject, successCb, errorCb, progressCb);
+	                        this.uploadNatively(payload, fileObject);
 	                    }
 	                }
 	            }
 	            else {
 	                //on web
 	                if (!payload.file) {
-	                    return errorCb("file parameter is required");
+	                    self.emit("error", "file parameter is required");
 	                }
 	                //use super agent
-	                this.uploadViaSuperAgent(payload, successCb, errorCb, progressCb);
+	                this.uploadViaSuperAgent(payload);
 	            }
 	        }
 	        catch (error) {
-	            errorCb(error);
+	            this.emit('error', {
+	                error: error
+	            });
 	        }
 	    };
-	    BackgroundUpload.prototype.uploadNatively = function (payload, fileObject, successCb, errorCb, progressCb) {
+	    BackgroundUpload.prototype.uploadNatively = function (payload, fileObject) {
 	        //externalCacheDirectory is only for android, fallback to cacheDirectory on iOS
 	        var directoryPath = cordova.file.externalCacheDirectory || cordova.file.cacheDirectory;
+	        var self = this;
 	        //write the file object to disk
 	        //and use its path to upload natively
 	        window.resolveLocalFileSystemURL(directoryPath, function (dir) {
@@ -156,7 +203,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            dir.getFile(fileName, {
 	                create: true
 	            }, function (tempFile) {
-	                console.log(tempFile);
 	                tempFile.createWriter(function (fileWriter) {
 	                    var hasError = false;
 	                    fileWriter.onwriteend = function (e) {
@@ -166,46 +212,116 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        payload.filePath = tempFile.nativeURL.replace('file://', ''); //directoryPath + fileName;
 	                        //remove the blob from the payload
 	                        delete payload.file;
-	                        return new FileTransferManager().upload(payload).then(function (response) {
-	                            //file uploaded, delete the temporary file
-	                            tempFile.remove(function () { }, function (excep) {
-	                                console.error('error cleaning up temp file: ' + excep);
-	                            });
-	                            successCb(response);
-	                        }, errorCb, progressCb);
+	                        self.nativeUploader.startUpload(payload);
 	                    };
 	                    fileWriter.onerror = function (ex) {
 	                        hasError = true;
 	                        console.error(ex);
-	                        return errorCb("error writing file to disk");
+	                        self.emit("error", {
+	                            error: "error writing file to disk"
+	                        });
 	                    };
 	                    fileWriter.write(fileObject);
 	                }, function (e) {
 	                    console.error(e);
-	                    return errorCb("error writing file to disk for upload");
+	                    self.emit("error", {
+	                        error: "error writing file to disk for upload"
+	                    });
 	                });
 	            });
 	        });
 	    };
-	    BackgroundUpload.prototype.uploadViaSuperAgent = function (payload, successCb, errorCb, progressCb) {
+	    BackgroundUpload.prototype.uploadViaSuperAgent = function (payload) {
+	        var self = this;
 	        request.post(payload.serverUrl)
 	            .set(payload.headers != null ? payload.headers : {})
 	            .field(payload.parameters != null ? payload.parameters : {})
 	            .on('progress', function (e) {
 	            if (e.percent != null && e.percent != undefined && e.percent >= 0) {
-	                progressCb(e.percent);
+	                self.emit('progress', {
+	                    id: payload.id,
+	                    progress: e.percent
+	                });
 	            }
 	        })
 	            .attach('file', payload.file)
 	            .end(function (err, res) {
 	            if (err != null) {
-	                errorCb(err);
+	                self.emit('error', {
+	                    id: payload.id,
+	                    error: err
+	                });
 	            }
 	            else {
-	                successCb(JSON.stringify(res.body));
+	                self.emit('success', {
+	                    id: payload.id,
+	                    serverResponse: JSON.stringify(res.body)
+	                });
 	            }
 	        });
 	    };
+	    /**
+	     * Listen for an event.
+	     *
+	     * Any event is supported, but the following are built-in:
+	     *
+	     *   - registration
+	     *   - notification
+	     *   - error
+	     *
+	     * @param {String} eventName to subscribe to.
+	     * @param {Function} callback triggered on the event.
+	     */
+	    BackgroundUpload.prototype.on = function (eventName, callback) {
+	        if (!this._handlers.hasOwnProperty(eventName)) {
+	            this._handlers[eventName] = [];
+	        }
+	        this._handlers[eventName].push(callback);
+	    };
+	    ;
+	    /**
+	     * Remove event listener.
+	     *
+	     * @param {String} eventName to match subscription.
+	     * @param {Function} handle function associated with event.
+	     */
+	    BackgroundUpload.prototype.off = function (eventName, handle) {
+	        if (this._handlers.hasOwnProperty(eventName)) {
+	            var handleIndex = this._handlers[eventName].indexOf(handle);
+	            if (handleIndex >= 0) {
+	                this._handlers[eventName].splice(handleIndex, 1);
+	            }
+	        }
+	    };
+	    ;
+	    /**
+	     * Emit an event.
+	     *
+	     * This is intended for internal use only.
+	     *
+	     * @param {String} eventName is the event to trigger.
+	     * @param {*} all arguments are passed to the event listeners.
+	     *
+	     * @return {Boolean} is true when the event is triggered otherwise false.
+	     */
+	    BackgroundUpload.prototype.emit = function (eventName, res) {
+	        var args = Array.prototype.slice.call(arguments);
+	        var eventName = args.shift();
+	        if (!this._handlers.hasOwnProperty(eventName)) {
+	            return false;
+	        }
+	        for (var i = 0, length = this._handlers[eventName].length; i < length; i++) {
+	            var callback = this._handlers[eventName][i];
+	            if (typeof callback === 'function') {
+	                callback.apply(undefined, args);
+	            }
+	            else {
+	                console.log('event handler: ' + eventName + ' must be a function');
+	            }
+	        }
+	        return true;
+	    };
+	    ;
 	    return BackgroundUpload;
 	}());
 	exports.BackgroundUpload = BackgroundUpload;
