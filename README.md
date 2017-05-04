@@ -32,7 +32,36 @@ cordova plugin add cordova-plugin-android-permissions --save
 
 ```javascript
  import { BackgroundUpload } from 'cordova-background-upload';
+
+ var uploader = new BackgroundUpload().init();
+
+ uploader.on('success', function(upload) {
+     console.log("upload: " + upload.id + " has been completed successfully");
+     console.log(upload.serverResponse);
+
+ });
+
+ uploader.on('progress', function(upload) {
+     console.log("uploading: " + upload.id + " progress: " + upload.progress + "%");
+
+ });
+
+ uploader.on('error', function(uploadException) {
+     if (uploadException.id) {
+         console.log("upload: " + uploadException.id + " has failed");
+     } else {
+         console.error("uploader caught an error: " + uploadException.error);
+     }
+ });
+
+```
+
+Adding an upload is done via the ``` 
+upload``` 
+method. In case the plugin was not able to enqueue the upload, an exception will be thrown in the error event listener.
+```javascript
  var payload = {
+     "id": "sd4ed",
      "file": fileObject, //the file object obtained from an input type='file'
      "serverUrl": "http://requestb.in/14cizzj1",
      "headers": {
@@ -43,19 +72,12 @@ cordova plugin add cordova-plugin-android-permissions --save
          "timestamp": 112321321
      }
  };
- var uploader = new BackgroundUpload();
- uploader.upload(payload,
- function(serverResponse) {
-     console.log('Success: ' + serverResponse);
- }, function(err) {
-     console.log('Error: ' + err);
- }, function(progress) {
-     console.log('upload progress: ' + progress);
- });
 
+uploader.upload(options);
 ```
 
 **Configuration** 
+ * id: a unique identifier to track the uploads (String)
  * filePath: the absolute path for the file to upload (applicable only on mobile platforms), if you are using an html input type file, write the file to disk, then use its path
  * file:  the file object obtained from an input type='file' (used only on browser)
  * serverUrl: remote server url
