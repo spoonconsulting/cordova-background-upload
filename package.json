@@ -1,6 +1,6 @@
 {
   "name": "cordova-background-upload",
-  "version": "0.0.10",
+  "version": "1.0.0",
   "description": "Js library to upload files on web and via cordova on mobile",
   "main": "dist/cordova-background-upload.js",
   "scripts": {
