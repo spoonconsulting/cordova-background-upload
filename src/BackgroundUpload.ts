@@ -2,12 +2,14 @@ declare var FileTransferManager: any, cordova: any;
 
 
 var request: any = require('superagent/lib/client');
+var Throttle = require('superagent-throttle/dist/browser')
 
 export class BackgroundUpload {
 
   constructor() {}
   private nativeUploader = null;
   private _handlers: any = [];
+  private throttleConfig; //use to configure superagent concurrent uploads
 
   public init(options) {
     this._handlers = {
@@ -31,6 +33,12 @@ export class BackgroundUpload {
       this.nativeUploader.on('error', function (uploadException) {
         self.emit('error', uploadException);
       });
+    } else {
+
+      this.throttleConfig = new Throttle({
+        concurrent: 1 // how many requests can be sent concurrently
+      })
+
     }
 
     return this;
@@ -207,13 +215,14 @@ export class BackgroundUpload {
   private uploadViaSuperAgent(payload) {
     let self = this;
     request.post(payload.serverUrl)
+      .use(this.throttleConfig.plugin())
       .set(payload.headers != null ? payload.headers : {})
       .field(payload.parameters != null ? payload.parameters : {})
       .on('progress', function (e) {
         if (e.percent != null && e.percent != undefined && e.percent >= 0) {
           self.emit('progress', {
             id: payload.id,
-            progress: Math.round( e.percent * 10 ) / 10
+            progress: Math.round(e.percent * 10) / 10
           });
         }
       })

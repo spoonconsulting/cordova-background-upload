@@ -34,6 +34,7 @@
     "yargs": "^4.2.0"
   },
   "dependencies": {
-    "superagent": "^3.5.2"
+    "superagent": "^3.5.2",
+    "superagent-throttle": "^0.2.4"
   }
 }
