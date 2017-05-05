@@ -240,7 +240,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (e.percent != null && e.percent != undefined && e.percent >= 0) {
 	                self.emit('progress', {
 	                    id: payload.id,
-	                    progress: e.percent
+	                    progress: Math.round(e.percent * 10) / 10
 	                });
 	            }
 	        })
