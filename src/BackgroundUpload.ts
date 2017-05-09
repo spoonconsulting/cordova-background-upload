@@ -152,6 +152,7 @@ export class BackgroundUpload {
         //on web
         if (!payload.file) {
           self.emit("error", "file parameter is required");
+          return;
         }
 
         //use super agent

@@ -189,6 +189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                //on web
 	                if (!payload.file) {
 	                    self_1.emit("error", "file parameter is required");
+	                    return;
 	                }
 	                //use super agent
 	                this.uploadViaSuperAgent(payload);
