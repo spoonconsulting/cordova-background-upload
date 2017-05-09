@@ -104,11 +104,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	                self_1.emit("error", {
 	                    error: "upload settings object is missing or invalid argument"
 	                });
+	                return;
 	            }
 	            if (!payload.serverUrl) {
 	                self_1.emit("error", {
 	                    error: "server url is required"
 	                });
+	                return;
 	            }
 	            if (!payload.headers) {
 	                payload.headers = {};

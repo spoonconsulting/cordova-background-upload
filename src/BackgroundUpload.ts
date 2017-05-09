@@ -53,12 +53,14 @@ export class BackgroundUpload {
         self.emit("error", {
           error: "upload settings object is missing or invalid argument"
         });
+         return;
       }
 
       if (!payload.serverUrl) {
         self.emit("error", {
           error: "server url is required"
         });
+        return;
       }
 
       if (!payload.headers) {
