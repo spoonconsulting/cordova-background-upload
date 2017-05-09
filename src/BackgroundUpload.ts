@@ -48,7 +48,7 @@ export class BackgroundUpload {
   public upload(payload) {
 
     try {
-
+      let self = this;
       if (!payload) {
         self.emit("error", {
           error: "upload settings object is missing or invalid argument"
@@ -123,7 +123,7 @@ export class BackgroundUpload {
               });
             }
             var permissions = cordova.plugins.permissions;
-            var self = this;
+            
             permissions.requestPermission(permissions.WRITE_EXTERNAL_STORAGE, function (status) {
               if (!status.hasPermission) {
                 self.emit("error", {

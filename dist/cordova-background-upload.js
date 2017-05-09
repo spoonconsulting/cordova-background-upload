@@ -99,13 +99,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    BackgroundUpload.prototype.upload = function (payload) {
 	        try {
+	            var self_1 = this;
 	            if (!payload) {
-	                self.emit("error", {
+	                self_1.emit("error", {
 	                    error: "upload settings object is missing or invalid argument"
 	                });
 	            }
 	            if (!payload.serverUrl) {
-	                self.emit("error", {
+	                self_1.emit("error", {
 	                    error: "server url is required"
 	                });
 	            }
@@ -113,7 +114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                payload.headers = {};
 	            }
 	            if (payload.serverUrl.trim() == '') {
-	                self.emit("error", {
+	                self_1.emit("error", {
 	                    error: "invalid server url"
 	                });
 	            }
@@ -123,17 +124,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                if (!fileObject) {
 	                    //check if filePath is available
 	                    if (!payload.filePath) {
-	                        self.emit("error", {
+	                        self_1.emit("error", {
 	                            error: "filePath parameter is required"
 	                        });
 	                    }
 	                    if (payload.filePath == "") {
-	                        self.emit("error", {
+	                        self_1.emit("error", {
 	                            error: "invalid filePath"
 	                        });
 	                    }
 	                    if (typeof FileTransferManager == 'undefined') {
-	                        self.emit("error", {
+	                        self_1.emit("error", {
 	                            error: 'cordova-plugin-background-upload not found..'
 	                        });
 	                    }
@@ -149,30 +150,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    //file object and upload plugin are available
 	                    //now check if file plugin has been installed
 	                    if (!cordova.file) {
-	                        self.emit("error", {
+	                        self_1.emit("error", {
 	                            error: 'cordova-plugin-file not found..install it via: cordova plugin add cordova-plugin-file --save'
 	                        });
 	                    }
 	                    if (cordova.platformId.toLowerCase() == "android") {
 	                        //reqquest for permission for file system on android
 	                        if (!cordova.plugins.permissions) {
-	                            self.emit("error", {
+	                            self_1.emit("error", {
 	                                error: 'cordova-plugin-android-permissions not found..install it via: cordova plugin add cordova-plugin-android-permissions --save'
 	                            });
 	                        }
 	                        var permissions = cordova.plugins.permissions;
-	                        var self = this;
 	                        permissions.requestPermission(permissions.WRITE_EXTERNAL_STORAGE, function (status) {
 	                            if (!status.hasPermission) {
-	                                self.emit("error", {
+	                                self_1.emit("error", {
 	                                    error: 'file system permission denied'
 	                                });
 	                            }
 	                            else {
-	                                self.uploadNatively(payload, fileObject);
+	                                self_1.uploadNatively(payload, fileObject);
 	                            }
 	                        }, function () {
-	                            self.emit("error", {
+	                            self_1.emit("error", {
 	                                error: 'file system permission denied'
 	                            });
 	                        });
@@ -186,7 +186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            else {
 	                //on web
 	                if (!payload.file) {
-	                    self.emit("error", "file parameter is required");
+	                    self_1.emit("error", "file parameter is required");
 	                }
 	                //use super agent
 	                this.uploadViaSuperAgent(payload);
