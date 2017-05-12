@@ -225,6 +225,7 @@ export class BackgroundUpload {
         if (e.percent != null && e.percent != undefined && e.percent >= 0) {
           self.emit('progress', {
             id: payload.id,
+            state: 'UPLOADING',
             progress: Math.round(e.percent * 10) / 10
           });
         }
@@ -234,11 +235,13 @@ export class BackgroundUpload {
         if (err != null) {
           self.emit('error', {
             id: payload.id,
+            state: 'FAILED',
             error: err
           });
         } else {
           self.emit('success', {
             id: payload.id,
+            state: 'SUCCESS',
             serverResponse: JSON.stringify(res.body)
           });
         }
