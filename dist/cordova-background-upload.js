@@ -267,7 +267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            else {
 	                self.emit('success', {
 	                    id: payload.id,
-	                    state: 'SUCCESS',
+	                    state: 'UPLOADED',
 	                    serverResponse: JSON.stringify(res.body)
 	                });
 	            }
